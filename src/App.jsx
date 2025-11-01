@@ -10,6 +10,10 @@ import Leave from './pages/Leave'
 import Expenses from './pages/Expenses'
 import Loans from './pages/Loans'
 import Profile from './pages/Profile'
+import EmployeeManagement from './pages/EmployeeManagement'
+import DocumentManagement from './pages/DocumentManagement'
+import RoleManagement from './pages/RoleManagement'
+import Approvals from './pages/Approvals'
 
 function App() {
   return (
@@ -26,6 +30,10 @@ function App() {
             <Route path="expenses" element={<Expenses />} />
             <Route path="loans" element={<Loans />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="employees" element={<EmployeeManagement />} />
+            <Route path="documents" element={<DocumentManagement />} />
+            <Route path="roles" element={<RoleManagement />} />
+            <Route path="approvals" element={<Approvals />} />
           </Route>
         </Routes>
       </BrowserRouter>
