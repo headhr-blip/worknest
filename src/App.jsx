@@ -14,6 +14,7 @@ import EmployeeManagement from './pages/EmployeeManagement'
 import DocumentManagement from './pages/DocumentManagement'
 import RoleManagement from './pages/RoleManagement'
 import Approvals from './pages/Approvals'
+import PayrollManagement from './pages/PayrollManagement'
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
             <Route path="documents" element={<DocumentManagement />} />
             <Route path="roles" element={<RoleManagement />} />
             <Route path="approvals" element={<Approvals />} />
+            <Route path="payroll" element={<PayrollManagement />} />
           </Route>
         </Routes>
       </BrowserRouter>
