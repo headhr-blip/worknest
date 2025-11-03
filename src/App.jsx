@@ -15,6 +15,7 @@ import DocumentManagement from './pages/DocumentManagement'
 import RoleManagement from './pages/RoleManagement'
 import Approvals from './pages/Approvals'
 import PayrollManagement from './pages/PayrollManagement'
+import BulkEmployeeUpload from './pages/BulkEmployeeUpload'
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
             <Route path="loans" element={<Loans />} />
             <Route path="profile" element={<Profile />} />
             <Route path="employees" element={<EmployeeManagement />} />
+            <Route path="bulk-upload" element={<BulkEmployeeUpload />} />
             <Route path="documents" element={<DocumentManagement />} />
             <Route path="roles" element={<RoleManagement />} />
             <Route path="approvals" element={<Approvals />} />
