@@ -41,74 +41,93 @@ export default function Layout() {
     }
   }
 
+  const menuItemStyle = (isActive) => ({
+    color: isActive ? '#60a5fa' : 'white',
+    textDecoration: 'none',
+    display: 'block',
+    padding: '10px 15px',
+    borderRadius: '5px',
+    background: isActive ? '#334155' : 'transparent',
+    transition: 'all 0.2s',
+    fontSize: '14px'
+  })
+
+  const sectionHeaderStyle = {
+    marginTop: '30px',
+    marginBottom: '10px',
+    padding: '10px 15px',
+    color: '#94a3b8',
+    fontSize: '11px',
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px'
+  }
+
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#f1f5f9' }}>
       {/* Sidebar */}
-      <aside style={{ width: '250px', background: '#1e293b', color: 'white', padding: '20px' }}>
-        <h2 style={{ marginBottom: '30px' }}>WorkNest</h2>
-        <nav>
-          <ul style={{ listStyle: 'none', padding: 0 }}>
-            <li style={{ marginBottom: '10px' }}>
-              <NavLink to="/dashboard" style={({ isActive }) => ({ 
-                color: isActive ? '#60a5fa' : 'white', 
-                textDecoration: 'none',
-                display: 'block',
-                padding: '10px',
-                borderRadius: '5px',
-                background: isActive ? '#334155' : 'transparent'
-              })}>
+      <aside style={{ 
+        width: '260px', 
+        background: 'linear-gradient(180deg, #1e293b 0%, #0f172a 100%)',
+        color: 'white', 
+        padding: '20px 0',
+        boxShadow: '2px 0 10px rgba(0,0,0,0.1)',
+        position: 'sticky',
+        top: 0,
+        height: '100vh',
+        overflowY: 'auto'
+      }}>
+        {/* Logo/Brand */}
+        <div style={{ 
+          padding: '0 20px 20px 20px', 
+          borderBottom: '1px solid rgba(255,255,255,0.1)',
+          marginBottom: '20px'
+        }}>
+          <h2 style={{ 
+            margin: 0, 
+            fontSize: '24px',
+            fontWeight: 'bold',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}>
+            WorkNest
+          </h2>
+          <p style={{ margin: '5px 0 0 0', fontSize: '11px', color: '#94a3b8' }}>
+            HR Management System
+          </p>
+        </div>
+
+        <nav style={{ padding: '0 10px' }}>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            {/* Employee Section */}
+            <li style={{ marginBottom: '5px' }}>
+              <NavLink to="/dashboard" style={({ isActive }) => menuItemStyle(isActive)}>
                 📊 Dashboard
               </NavLink>
             </li>
             
-            <li style={{ marginBottom: '10px' }}>
-              <NavLink to="/attendance" style={({ isActive }) => ({ 
-                color: isActive ? '#60a5fa' : 'white', 
-                textDecoration: 'none',
-                display: 'block',
-                padding: '10px',
-                borderRadius: '5px',
-                background: isActive ? '#334155' : 'transparent'
-              })}>
+            <li style={{ marginBottom: '5px' }}>
+              <NavLink to="/attendance" style={({ isActive }) => menuItemStyle(isActive)}>
                 ⏰ Attendance
               </NavLink>
             </li>
             
-            <li style={{ marginBottom: '10px' }}>
-              <NavLink to="/leave" style={({ isActive }) => ({ 
-                color: isActive ? '#60a5fa' : 'white', 
-                textDecoration: 'none',
-                display: 'block',
-                padding: '10px',
-                borderRadius: '5px',
-                background: isActive ? '#334155' : 'transparent'
-              })}>
+            <li style={{ marginBottom: '5px' }}>
+              <NavLink to="/leave" style={({ isActive }) => menuItemStyle(isActive)}>
                 🏖️ Leave
               </NavLink>
             </li>
             
-            <li style={{ marginBottom: '10px' }}>
-              <NavLink to="/expenses" style={({ isActive }) => ({ 
-                color: isActive ? '#60a5fa' : 'white', 
-                textDecoration: 'none',
-                display: 'block',
-                padding: '10px',
-                borderRadius: '5px',
-                background: isActive ? '#334155' : 'transparent'
-              })}>
+            <li style={{ marginBottom: '5px' }}>
+              <NavLink to="/expenses" style={({ isActive }) => menuItemStyle(isActive)}>
                 💰 Expenses
               </NavLink>
             </li>
             
-            <li style={{ marginBottom: '10px' }}>
-              <NavLink to="/loans" style={({ isActive }) => ({ 
-                color: isActive ? '#60a5fa' : 'white', 
-                textDecoration: 'none',
-                display: 'block',
-                padding: '10px',
-                borderRadius: '5px',
-                background: isActive ? '#334155' : 'transparent'
-              })}>
+            <li style={{ marginBottom: '5px' }}>
+              <NavLink to="/loans" style={({ isActive }) => menuItemStyle(isActive)}>
                 🏦 Loans
               </NavLink>
             </li>
@@ -116,18 +135,11 @@ export default function Layout() {
             {/* Manager/HR Section */}
             {hasRole(['manager', 'team_lead', 'hr', 'hr_head', 'branch_hr', 'super_admin', 'admin']) && (
               <>
-                <li style={{ marginTop: '30px', marginBottom: '10px', padding: '10px', color: '#94a3b8', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>
+                <li style={sectionHeaderStyle}>
                   Management
                 </li>
-                <li style={{ marginBottom: '10px' }}>
-                  <NavLink to="/approvals" style={({ isActive }) => ({ 
-                    color: isActive ? '#60a5fa' : 'white', 
-                    textDecoration: 'none',
-                    display: 'block',
-                    padding: '10px',
-                    borderRadius: '5px',
-                    background: isActive ? '#334155' : 'transparent'
-                  })}>
+                <li style={{ marginBottom: '5px' }}>
+                  <NavLink to="/approvals" style={({ isActive }) => menuItemStyle(isActive)}>
                     ✅ Approvals
                   </NavLink>
                 </li>
@@ -137,30 +149,21 @@ export default function Layout() {
             {/* Admin Section */}
             {hasRole(['hr', 'hr_head', 'branch_hr', 'super_admin', 'admin']) && (
               <>
-                <li style={{ marginTop: '30px', marginBottom: '10px', padding: '10px', color: '#94a3b8', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>
+                <li style={sectionHeaderStyle}>
                   Administration
                 </li>
-                <li style={{ marginBottom: '10px' }}>
-                  <NavLink to="/employees" style={({ isActive }) => ({ 
-                    color: isActive ? '#60a5fa' : 'white', 
-                    textDecoration: 'none',
-                    display: 'block',
-                    padding: '10px',
-                    borderRadius: '5px',
-                    background: isActive ? '#334155' : 'transparent'
-                  })}>
+                <li style={{ marginBottom: '5px' }}>
+                  <NavLink to="/employees" style={({ isActive }) => menuItemStyle(isActive)}>
                     👥 Employees
                   </NavLink>
                 </li>
-                <li style={{ marginBottom: '10px' }}>
-                  <NavLink to="/documents" style={({ isActive }) => ({ 
-                    color: isActive ? '#60a5fa' : 'white', 
-                    textDecoration: 'none',
-                    display: 'block',
-                    padding: '10px',
-                    borderRadius: '5px',
-                    background: isActive ? '#334155' : 'transparent'
-                  })}>
+                <li style={{ marginBottom: '5px' }}>
+                  <NavLink to="/payroll" style={({ isActive }) => menuItemStyle(isActive)}>
+                    💵 Payroll
+                  </NavLink>
+                </li>
+                <li style={{ marginBottom: '5px' }}>
+                  <NavLink to="/documents" style={({ isActive }) => menuItemStyle(isActive)}>
                     📄 Documents
                   </NavLink>
                 </li>
@@ -169,78 +172,145 @@ export default function Layout() {
 
             {/* Super Admin Only */}
             {hasRole(['super_admin']) && (
-              <li style={{ marginBottom: '10px' }}>
-                <NavLink to="/roles" style={({ isActive }) => ({ 
-                  color: isActive ? '#60a5fa' : 'white', 
-                  textDecoration: 'none',
-                  display: 'block',
-                  padding: '10px',
-                  borderRadius: '5px',
-                  background: isActive ? '#334155' : 'transparent'
-                })}>
-                  🔐 Role Management
-                </NavLink>
-              </li>
+              <>
+                <li style={sectionHeaderStyle}>
+                  System Administration
+                </li>
+                <li style={{ marginBottom: '5px' }}>
+                  <NavLink to="/roles" style={({ isActive }) => menuItemStyle(isActive)}>
+                    🔐 Role Management
+                  </NavLink>
+                </li>
+              </>
             )}
             
-            <li style={{ marginTop: '30px', marginBottom: '10px' }}>
-              <NavLink to="/profile" style={({ isActive }) => ({ 
-                color: isActive ? '#60a5fa' : 'white', 
-                textDecoration: 'none',
-                display: 'block',
-                padding: '10px',
-                borderRadius: '5px',
-                background: isActive ? '#334155' : 'transparent'
-              })}>
-                👤 Profile
+            {/* Profile Section */}
+            <li style={sectionHeaderStyle}>
+              Account
+            </li>
+            <li style={{ marginBottom: '5px' }}>
+              <NavLink to="/profile" style={({ isActive }) => menuItemStyle(isActive)}>
+                👤 My Profile
               </NavLink>
             </li>
           </ul>
         </nav>
-        <button 
-          onClick={handleSignOut}
-          style={{ 
-            marginTop: '50px', 
-            width: '100%', 
-            padding: '10px', 
-            background: '#dc2626', 
-            color: 'white', 
-            border: 'none', 
-            borderRadius: '5px', 
-            cursor: 'pointer' 
-          }}
-        >
-          Sign Out
-        </button>
+
+        {/* Sign Out Button */}
+        <div style={{ padding: '20px', position: 'absolute', bottom: '0', width: '260px', background: 'rgba(0,0,0,0.2)' }}>
+          <button 
+            onClick={handleSignOut}
+            style={{ 
+              width: '100%', 
+              padding: '12px', 
+              background: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
+              color: 'white', 
+              border: 'none', 
+              borderRadius: '5px', 
+              cursor: 'pointer',
+              fontWeight: '600',
+              fontSize: '14px',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+              transition: 'transform 0.2s'
+            }}
+            onMouseOver={(e) => e.target.style.transform = 'scale(1.02)'}
+            onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
+          >
+            🚪 Sign Out
+          </button>
+        </div>
       </aside>
 
-      {/* Main Content */}
-      <div style={{ flex: 1, background: '#f1f5f9' }}>
+      {/* Main Content Area */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         {/* Header */}
-        <header style={{ background: 'white', padding: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+        <header style={{ 
+          background: 'white', 
+          padding: '20px 30px', 
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          borderBottom: '1px solid #e2e8f0'
+        }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h1 style={{ margin: 0 }}>Welcome, {profile?.first_name || 'User'}!</h1>
             <div>
+              <h1 style={{ margin: '0 0 5px 0', fontSize: '24px', color: '#1e293b' }}>
+                Welcome, {profile?.first_name || 'User'}!
+              </h1>
+              <p style={{ margin: 0, fontSize: '14px', color: '#64748b' }}>
+                {profile?.employee_id && `Employee ID: ${profile.employee_id}`}
+                {profile?.designation && ` • ${profile.designation}`}
+                {profile?.department && ` • ${profile.department}`}
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              {/* Role Badges */}
               {userRoles.length > 0 && (
-                <span style={{ 
-                  padding: '6px 12px', 
-                  background: '#3b82f6', 
-                  color: 'white', 
-                  borderRadius: '12px', 
-                  fontSize: '12px',
-                  fontWeight: '500'
-                }}>
-                  {userRoles.join(', ').toUpperCase()}
-                </span>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {userRoles.map((role) => (
+                    <span 
+                      key={role}
+                      style={{ 
+                        padding: '6px 12px', 
+                        background: role === 'super_admin' ? 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)' :
+                                   role.includes('hr') ? 'linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)' :
+                                   role === 'manager' ? 'linear-gradient(135deg, #10b981 0%, #047857 100%)' :
+                                   'linear-gradient(135deg, #6366f1 0%, #4338ca 100%)',
+                        color: 'white', 
+                        borderRadius: '20px', 
+                        fontSize: '11px',
+                        fontWeight: '700',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                      }}
+                    >
+                      {role.replace('_', ' ')}
+                    </span>
+                  ))}
+                </div>
               )}
+              
+              {/* Current Time */}
+              <div style={{ 
+                padding: '8px 16px', 
+                background: '#f1f5f9', 
+                borderRadius: '8px',
+                fontSize: '12px',
+                color: '#64748b',
+                fontWeight: '500'
+              }}>
+                {new Date().toLocaleDateString('en-IN', { 
+                  weekday: 'short', 
+                  day: 'numeric', 
+                  month: 'short', 
+                  year: 'numeric' 
+                })}
+              </div>
             </div>
           </div>
         </header>
 
         {/* Page Content */}
-        <main style={{ padding: '30px' }}>
+        <main style={{ 
+          flex: 1,
+          padding: '30px',
+          overflowY: 'auto'
+        }}>
           <Outlet />
         </main>
+
+        {/* Footer */}
+        <footer style={{ 
+          background: 'white', 
+          padding: '15px 30px', 
+          borderTop: '1px solid #e2e8f0',
+          textAlign: 'center',
+          fontSize: '12px',
+          color: '#64748b'
+        }}>
+          <p style={{ margin: 0 }}>
+            © 2025 WorkNest HRMS. All rights reserved. | Version 1.0
+          </p>
+        </footer>
       </div>
     </div>
   )
