@@ -158,6 +158,11 @@ export default function Layout() {
                   </NavLink>
                 </li>
                 <li style={{ marginBottom: '5px' }}>
+                  <NavLink to="/bulk-upload" style={({ isActive }) => menuItemStyle(isActive)}>
+                    📤 Bulk Upload
+                  </NavLink>
+                </li>
+                <li style={{ marginBottom: '5px' }}>
                   <NavLink to="/payroll" style={({ isActive }) => menuItemStyle(isActive)}>
                     💵 Payroll
                   </NavLink>
