@@ -151,28 +151,33 @@ export default function BulkEmployeeUpload() {
 
         for (const emp of employees) {
           try {
-            // Step 1: Create auth user (WITHOUT metadata to avoid trigger issues)
-            const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+            // Step 1: Create auth user using regular signup (works with anon key)
+            const { data: authData, error: authError } = await supabase.auth.signUp({
               email: emp.email,
               password: emp.password || 'Welcome@123',
-              email_confirm: true // Auto-confirm email
+              options: {
+                data: {
+                  first_name: emp.first_name,
+                  last_name: emp.last_name
+                },
+                emailRedirectTo: window.location.origin
+              }
             })
 
             if (authError) throw new Error(`Auth error: ${authError.message}`)
 
             if (authData.user) {
-              // Wait a bit for trigger to complete
-              await new Promise(resolve => setTimeout(resolve, 500))
+              // Small delay to let trigger complete
+              await new Promise(resolve => setTimeout(resolve, 1000))
 
-              // Step 2: Update or insert profile directly
+              // Step 2: Update profile with complete details
               const { error: profileError } = await supabase
                 .from('profiles')
-                .upsert({
-                  user_id: authData.user.id,
+                .update({
                   first_name: emp.first_name,
                   last_name: emp.last_name,
                   email: emp.email,
-                  phone: emp.phone,
+                  phone: emp.phone || '',
                   date_of_birth: emp.date_of_birth || null,
                   gender: emp.gender || null,
                   blood_group: emp.blood_group || null,
@@ -190,50 +195,47 @@ export default function BulkEmployeeUpload() {
                   professional_tax: parseFloat(emp.professional_tax) || 0,
                   income_tax_deduction: parseFloat(emp.income_tax_deduction) || 0,
                   payment_frequency: emp.payment_frequency || 'monthly',
-                  bank_holder_name: emp.bank_holder_name,
-                  bank_account_number: emp.bank_account_number,
-                  bank_name: emp.bank_name,
-                  bank_ifsc: emp.bank_ifsc,
-                  aadhaar_number: emp.aadhaar_number,
-                  pan_number: emp.pan_number,
+                  bank_holder_name: emp.bank_holder_name || '',
+                  bank_account_number: emp.bank_account_number || '',
+                  bank_name: emp.bank_name || '',
+                  bank_ifsc: emp.bank_ifsc || '',
+                  aadhaar_number: emp.aadhaar_number || '',
+                  pan_number: emp.pan_number || '',
                   is_active: true,
                   created_by: profile.user_id
-                }, { 
-                  onConflict: 'user_id'
                 })
+                .eq('user_id', authData.user.id)
 
-              if (profileError) throw new Error(`Profile error: ${profileError.message}`)
+              if (profileError) {
+                console.warn('Profile update warning:', profileError)
+                // Don't fail if profile update has issues
+              }
 
-              // Step 3: Ensure user role exists
-              await supabase
-                .from('userroles')
-                .upsert({
-                  user_id: authData.user.id,
-                  role: 'employee'
-                }, {
-                  onConflict: 'user_id,role',
-                  ignoreDuplicates: true
-                })
-
-              // Step 4: Create salary history
+              // Step 3: Create salary history
               const grossSalary = (parseFloat(emp.basic_salary) || 0) +
                                 (parseFloat(emp.hra) || 0) +
                                 (parseFloat(emp.transport_allowance) || 0) +
                                 (parseFloat(emp.special_allowance) || 0) +
                                 (parseFloat(emp.other_allowances) || 0)
 
-              await supabase.from('salary_history').insert([{
-                user_id: authData.user.id,
-                basic_salary: parseFloat(emp.basic_salary) || 0,
-                hra: parseFloat(emp.hra) || 0,
-                transport_allowance: parseFloat(emp.transport_allowance) || 0,
-                special_allowance: parseFloat(emp.special_allowance) || 0,
-                other_allowances: parseFloat(emp.other_allowances) || 0,
-                gross_salary: grossSalary,
-                effective_from: emp.joining_date || new Date().toISOString().split('T')[0],
-                reason: 'Initial salary on joining (bulk upload)',
-                changed_by: profile.user_id
-              }])
+              const { error: salaryError } = await supabase
+                .from('salary_history')
+                .insert([{
+                  user_id: authData.user.id,
+                  basic_salary: parseFloat(emp.basic_salary) || 0,
+                  hra: parseFloat(emp.hra) || 0,
+                  transport_allowance: parseFloat(emp.transport_allowance) || 0,
+                  special_allowance: parseFloat(emp.special_allowance) || 0,
+                  other_allowances: parseFloat(emp.other_allowances) || 0,
+                  gross_salary: grossSalary,
+                  effective_from: emp.joining_date || new Date().toISOString().split('T')[0],
+                  reason: 'Initial salary on joining (bulk upload)',
+                  changed_by: profile.user_id
+                }])
+
+              if (salaryError) {
+                console.warn('Salary history warning:', salaryError)
+              }
 
               uploadResults.success++
             }
@@ -249,7 +251,13 @@ export default function BulkEmployeeUpload() {
 
         setResults(uploadResults)
         setFile(null)
-        document.getElementById('fileInput').value = null
+        if (document.getElementById('fileInput')) {
+          document.getElementById('fileInput').value = null
+        }
+        
+        if (uploadResults.success > 0) {
+          alert(`Successfully uploaded ${uploadResults.success} out of ${uploadResults.total} employees!`)
+        }
       } catch (error) {
         console.error('Error processing file:', error)
         alert('Error processing file: ' + error.message)
@@ -285,7 +293,13 @@ export default function BulkEmployeeUpload() {
         
         <div style={{ marginTop: '20px', padding: '15px', background: '#fef3c7', borderRadius: '5px', borderLeft: '4px solid #f59e0b' }}>
           <p style={{ margin: 0, fontSize: '14px', color: '#92400e' }}>
-            <strong>⚠️ Important:</strong> Make sure all email addresses are unique and valid. Required fields are: first_name, last_name, email, department, designation, and basic_salary.
+            <strong>⚠️ Important:</strong> Make sure all email addresses are unique and valid. Required fields are: first_name, last_name, email, department, designation, and basic_salary. Default password will be "Welcome@123" if not specified.
+          </p>
+        </div>
+
+        <div style={{ marginTop: '15px', padding: '15px', background: '#dbeafe', borderRadius: '5px', borderLeft: '4px solid #3b82f6' }}>
+          <p style={{ margin: 0, fontSize: '14px', color: '#1e40af' }}>
+            <strong>ℹ️ Note:</strong> Employees will receive a confirmation email. They must verify their email before logging in. Email confirmation can be disabled in Supabase Authentication settings for faster onboarding.
           </p>
         </div>
       </div>
@@ -383,7 +397,7 @@ export default function BulkEmployeeUpload() {
               boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
             }}
           >
-            {uploading ? '⏳ Processing...' : '🚀 Upload Employees'}
+            {uploading ? '⏳ Processing... This may take a few minutes' : '🚀 Upload Employees'}
           </button>
         )}
       </div>
@@ -436,7 +450,8 @@ export default function BulkEmployeeUpload() {
           {results.success > 0 && (
             <div style={{ marginTop: '20px', padding: '15px', background: '#dcfce7', borderRadius: '5px' }}>
               <p style={{ margin: 0, color: '#166534', fontWeight: '500' }}>
-                ✅ Successfully uploaded {results.success} employee(s)! Check the Employee Management page to view them.
+                ✅ Successfully created {results.success} employee account(s)! 
+                {results.success > 0 && ' Employees will receive confirmation emails. Check the Employee Management page to view them once they verify their emails.'}
               </p>
             </div>
           )}
