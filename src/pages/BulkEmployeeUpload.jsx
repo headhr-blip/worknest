@@ -9,7 +9,6 @@ export default function BulkEmployeeUpload() {
   const [results, setResults] = useState(null)
 
   const downloadTemplate = () => {
-    // Create CSV template with headers
     const headers = [
       'first_name',
       'last_name',
@@ -41,7 +40,6 @@ export default function BulkEmployeeUpload() {
       'pan_number'
     ]
 
-    // Sample data row for reference
     const sampleData = [
       'John',
       'Doe',
@@ -73,15 +71,12 @@ export default function BulkEmployeeUpload() {
       'ABCDE1234F'
     ]
 
-    // Create CSV content
     const csvContent = [
       headers.join(','),
       sampleData.join(','),
-      // Add empty row for user to fill
       headers.map(() => '').join(',')
     ].join('\n')
 
-    // Create blob and download
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
@@ -118,7 +113,6 @@ export default function BulkEmployeeUpload() {
         headers.forEach((header, index) => {
           row[header] = values[index]?.trim() || ''
         })
-        // Skip sample data row or empty rows
         if (row.email && row.email !== 'john.doe@example.com' && row.email.includes('@')) {
           data.push(row)
         }
@@ -157,27 +151,27 @@ export default function BulkEmployeeUpload() {
 
         for (const emp of employees) {
           try {
-            // Create auth user
-            const { data: authData, error: authError } = await supabase.auth.signUp({
+            // Step 1: Create auth user (WITHOUT metadata to avoid trigger issues)
+            const { data: authData, error: authError } = await supabase.auth.admin.createUser({
               email: emp.email,
               password: emp.password || 'Welcome@123',
-              options: {
-                data: {
-                  first_name: emp.first_name,
-                  last_name: emp.last_name
-                }
-              }
+              email_confirm: true // Auto-confirm email
             })
 
             if (authError) throw new Error(`Auth error: ${authError.message}`)
 
             if (authData.user) {
-              // Update profile with complete details
+              // Wait a bit for trigger to complete
+              await new Promise(resolve => setTimeout(resolve, 500))
+
+              // Step 2: Update or insert profile directly
               const { error: profileError } = await supabase
                 .from('profiles')
-                .update({
+                .upsert({
+                  user_id: authData.user.id,
                   first_name: emp.first_name,
                   last_name: emp.last_name,
+                  email: emp.email,
                   phone: emp.phone,
                   date_of_birth: emp.date_of_birth || null,
                   gender: emp.gender || null,
@@ -202,13 +196,26 @@ export default function BulkEmployeeUpload() {
                   bank_ifsc: emp.bank_ifsc,
                   aadhaar_number: emp.aadhaar_number,
                   pan_number: emp.pan_number,
+                  is_active: true,
                   created_by: profile.user_id
+                }, { 
+                  onConflict: 'user_id'
                 })
-                .eq('user_id', authData.user.id)
 
               if (profileError) throw new Error(`Profile error: ${profileError.message}`)
 
-              // Create salary history
+              // Step 3: Ensure user role exists
+              await supabase
+                .from('userroles')
+                .upsert({
+                  user_id: authData.user.id,
+                  role: 'employee'
+                }, {
+                  onConflict: 'user_id,role',
+                  ignoreDuplicates: true
+                })
+
+              // Step 4: Create salary history
               const grossSalary = (parseFloat(emp.basic_salary) || 0) +
                                 (parseFloat(emp.hra) || 0) +
                                 (parseFloat(emp.transport_allowance) || 0) +
